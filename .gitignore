@@ -1,0 +1,13 @@
+.pio
+.vscode
+include
+lib
+logs
+CMakeLists.txt
+dependencies.lock
+flash_partitions.csv
+platformio.ini
+sdkconfig.esp-wrover-kit
+sdkconfig.esp-wrover-kit.old
+src/main.cpp
+src/CMakeLists.txt
