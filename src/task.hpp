@@ -18,6 +18,7 @@ namespace freertos {
                 task(bool auto_start = false);
             public:
                 ~task();
+                bool remove(void);
                 bool resume(void);
                 bool resume_from_isr(void);
                 bool suspend(void);
@@ -73,6 +74,7 @@ namespace freertos {
                     }
                 }
 
+                using abstract::task::remove;
                 using abstract::task::resume;
                 using abstract::task::suspend;
                 using abstract::task::is_running;
@@ -120,6 +122,7 @@ namespace freertos {
                     }
                 }
                 
+                using abstract::task::remove;
                 using abstract::task::resume;
                 using abstract::task::suspend;
                 using abstract::task::is_running;
@@ -171,6 +174,7 @@ namespace freertos {
                     }
                 }
 
+                using abstract::task::remove;
                 using abstract::task::resume;
                 using abstract::task::suspend;
                 using abstract::task::is_running;
@@ -215,6 +219,7 @@ namespace freertos {
                     }
                 }
 
+                using abstract::task::remove;
                 using abstract::task::resume;
                 using abstract::task::suspend;
                 using abstract::task::is_running;

@@ -6,10 +6,16 @@ using namespace constants;
 using namespace typedefs;
 
 timer::~timer(){
-    if (this->handle != nullptr) {
-        xTimerDelete(handle, 0);
+    this->remove();
+}
+
+bool timer::remove(void){
+    if (this->handle != nullptr && xTimerDelete(this->handle, 0) == pdPASS) {
         this->handle = nullptr;
+        return true;
     }
+
+    return false;
 }
 
 bool timer::start(uint32_t delay_ms){

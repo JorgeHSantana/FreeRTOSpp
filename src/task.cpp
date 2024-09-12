@@ -10,12 +10,17 @@ task::task(bool auto_start){
 }
 
 task::~task(void) {
+    this->remove();
+}
+
+bool task::remove(void) {
     if (!this->is_valid()) {
-        return;
+        return false;
     }
 
     vTaskDelete(this->handle);
     this->handle = nullptr;
+    return true;
 }
 
 bool task::resume(void) {

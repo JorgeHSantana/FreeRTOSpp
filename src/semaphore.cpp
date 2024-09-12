@@ -8,9 +8,18 @@ semaphore_type(semaphore_type)
 {}
 
 semaphore::~semaphore(void) {
+    this->remove();
+}
+
+bool semaphore::remove(void) {
+    if (this->handle == nullptr) {
+        return false;
+    }
+
     vSemaphoreDelete(this->handle);
     this->handle = nullptr;
     this->semaphore_type = type::none;
+    return true;
 }
 
 bool semaphore::is_valid(void) const {
