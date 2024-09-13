@@ -13,7 +13,6 @@ namespace freertos {
                 timer_handle handle;
             public:
                 ~timer();
-                bool remove(void);
                 bool start(uint32_t delay_ms = 0);
                 bool start_from_isr(void);
                 bool stop(uint32_t delay_ms = 0);

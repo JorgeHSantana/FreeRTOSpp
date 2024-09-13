@@ -30,17 +30,10 @@ namespace freertos {
             {}
         public:
             ~collection(void){
-                this->remove();
-            }
-
-            bool remove(void) {
-                if (this->handle == nullptr) {
-                    return false;
+                if (this->handle != nullptr) {
+                    vQueueDelete(this->handle);
+                    this->handle = nullptr;
                 }
-
-                vQueueDelete(this->handle);
-                this->handle = nullptr;
-                return true;
             }
 
             bool pop(DATA_TYPE& data, uint32_t timeout_ms = max_delay_ms) {

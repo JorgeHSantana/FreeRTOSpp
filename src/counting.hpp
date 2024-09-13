@@ -8,7 +8,6 @@ namespace freertos {
         public:
             counting(uint32_t max_count, uint32_t initial_count = 0);
 
-            using abstract::semaphore::remove;
             using abstract::semaphore::give;
             using abstract::semaphore::take;
             using abstract::semaphore::give_from_isr;
@@ -24,7 +23,6 @@ namespace freertos {
         public:
             counting(uint32_t max_count, uint32_t initial_count = 0);
 
-            using abstract::semaphore::remove;
             using abstract::semaphore::give;
             using abstract::semaphore::take;
             using abstract::semaphore::give_from_isr;
