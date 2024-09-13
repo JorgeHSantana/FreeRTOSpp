@@ -8,7 +8,6 @@ namespace freertos {
         public:
             binary(void);
 
-            using abstract::semaphore::remove;
             using abstract::semaphore::give;
             using abstract::semaphore::take;
             using abstract::semaphore::give_from_isr;
@@ -24,7 +23,6 @@ namespace freertos {
         public:
             binary(void);
 
-            using abstract::semaphore::remove;
             using abstract::semaphore::give;
             using abstract::semaphore::take;
             using abstract::semaphore::give_from_isr;

@@ -25,7 +25,6 @@ namespace freertos {
             semaphore(type semaphore_type);
         public:
             ~semaphore(void);
-            bool remove(void);
             bool is_valid(void) const;
 
             virtual bool give(void);
