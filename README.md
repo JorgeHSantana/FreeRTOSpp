@@ -22,6 +22,29 @@ To use FreeRTOS++, simply include the necessary headers and link the library wit
 #include "etl/type_traits.h"
 #include "freertos.hpp"
 
+class my_app : public freertos::abstract::app {
+    private:
+        static constexpr const char* name = "Test";
+        static constexpr uint32_t stack_size = 1024;
+        static constexpr uint16_t priority = 1;
+
+        freertos::stack::task<stack_size, freertos::abstract::app&> task;
+
+        static void main(freertos::abstract::app& app);
+    public:
+        my_app() : freertos::abstract::app(task), task(name, priority, false, *this, my_app::main) {}
+        static my_app& instance(void){
+            static my_app instance;
+            return instance;
+        }
+};
+
+void my_app::main(freertos::abstract::app& app){
+    while(1){
+        Serial.println("Hello World");
+    }
+}
+
 void setup() {
     Serial.begin(115200);
 
@@ -96,6 +119,8 @@ void setup() {
     static freertos::heap::timer<void> printer2("timer2", [](void) {
         Serial.printf("timer2!\n");
     }, 200, true, true);
+
+    my_app::instance().start();
 }
 
 void loop() {
