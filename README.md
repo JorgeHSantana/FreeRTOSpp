@@ -31,8 +31,8 @@ class my_app : public freertos::abstract::app {
         freertos::stack::task<stack_size, freertos::abstract::app&> task;
 
         static void main(freertos::abstract::app& app);
-    public:
         my_app() : freertos::abstract::app(task), task(name, priority, false, *this, my_app::main) {}
+    public:
         static my_app& instance(void){
             static my_app instance;
             return instance;
