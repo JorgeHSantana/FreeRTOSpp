@@ -73,6 +73,20 @@ namespace freertos {
                     }
                 }
 
+                #if defined(ESP32)
+                    task(const char* name, uint16_t priority, bool auto_start, ARGUMENT_TYPE param, void (*callback)(ARGUMENT_TYPE), uint32_t core_id) :
+                    abstract::task(auto_start),
+                    arguments(param),
+                    callback(callback)
+                    {
+                        this->handle = xTaskCreateStaticPinnedToCore(wrapper, name, STACK_SIZE, this, this->auto_start ? priority : constants::max_priority, stack, &buffer, core_id);
+                        if (this->handle != nullptr && !this->auto_start) {
+                            this->join();
+                            vTaskPrioritySet(this->handle, priority);
+                        }
+                    }
+                #endif
+
                 using abstract::task::resume;
                 using abstract::task::suspend;
                 using abstract::task::is_running;
@@ -119,6 +133,19 @@ namespace freertos {
                         vTaskPrioritySet(this->handle, priority);
                     }
                 }
+
+                #if defined(ESP32)
+                    task(const char* name, uint16_t priority, bool auto_start, void (*callback)(void), uint32_t core_id) :
+                    abstract::task(auto_start),
+                    callback(callback)
+                    {
+                        this->handle = xTaskCreateStaticPinnedToCore(wrapper, name, STACK_SIZE, this, this->auto_start ? priority : constants::max_priority, stack, &buffer, core_id);
+                        if (this->handle != nullptr && !this->auto_start) {
+                            this->join();
+                            vTaskPrioritySet(this->handle, priority);
+                        }
+                    }
+                #endif
                 
                 using abstract::task::resume;
                 using abstract::task::suspend;
@@ -171,6 +198,20 @@ namespace freertos {
                     }
                 }
 
+                #if defined(ESP32)
+                    task(const char* name, uint16_t priority, bool auto_start, uint32_t sack_size, ARGUMENT_TYPE param, void (*callback)(ARGUMENT_TYPE), uint32_t core_id) :
+                    abstract::task(auto_start),
+                    arguments(param),
+                    callback(callback)
+                    {
+                        BaseType_t status = xTaskCreatePinnedToCore(wrapper, name, sack_size, this, this->auto_start ? priority : constants::max_priority, &this->handle, core_id) == pdPASS;
+                        if (status == pdPASS && !this->auto_start) {
+                            this->join();
+                            vTaskPrioritySet(this->handle, priority);
+                        }
+                    }
+                #endif
+
                 using abstract::task::resume;
                 using abstract::task::suspend;
                 using abstract::task::is_running;
@@ -214,6 +255,19 @@ namespace freertos {
                         vTaskPrioritySet(this->handle, priority);
                     }
                 }
+                
+                #if defined(ESP32)
+                    task(const char* name, uint16_t priority, bool auto_start, uint32_t sack_size, std::function <void()> callback, uint32_t core_id) :
+                    abstract::task(auto_start),
+                    callback(callback)
+                    {
+                        BaseType_t status = xTaskCreatePinnedToCore(wrapper, name, sack_size, this, this->auto_start ? priority : constants::max_priority, &this->handle, core_id) == pdPASS;
+                        if (status == pdPASS && !this->auto_start) {
+                            this->join();
+                            vTaskPrioritySet(this->handle, priority);
+                        }
+                    }
+                #endif
 
                 using abstract::task::resume;
                 using abstract::task::suspend;
