@@ -74,7 +74,7 @@ namespace freertos {
                 }
 
                 #if defined(ESP32)
-                    task(const char* name, uint16_t priority, bool auto_start, ARGUMENT_TYPE param, void (*callback)(ARGUMENT_TYPE), uint32_t core_id) :
+                    task(const char* name, uint16_t priority, bool auto_start, ARGUMENT_TYPE param, void (*callback)(ARGUMENT_TYPE), uint8_t core_id) :
                     abstract::task(auto_start),
                     arguments(param),
                     callback(callback)
@@ -135,7 +135,7 @@ namespace freertos {
                 }
 
                 #if defined(ESP32)
-                    task(const char* name, uint16_t priority, bool auto_start, void (*callback)(void), uint32_t core_id) :
+                    task(const char* name, uint16_t priority, bool auto_start, void (*callback)(void), uint8_t core_id) :
                     abstract::task(auto_start),
                     callback(callback)
                     {
@@ -199,7 +199,7 @@ namespace freertos {
                 }
 
                 #if defined(ESP32)
-                    task(const char* name, uint16_t priority, bool auto_start, uint32_t sack_size, ARGUMENT_TYPE param, void (*callback)(ARGUMENT_TYPE), uint32_t core_id) :
+                    task(const char* name, uint16_t priority, bool auto_start, uint32_t sack_size, ARGUMENT_TYPE param, void (*callback)(ARGUMENT_TYPE), uint8_t core_id) :
                     abstract::task(auto_start),
                     arguments(param),
                     callback(callback)
@@ -257,7 +257,7 @@ namespace freertos {
                 }
                 
                 #if defined(ESP32)
-                    task(const char* name, uint16_t priority, bool auto_start, uint32_t sack_size, std::function <void()> callback, uint32_t core_id) :
+                    task(const char* name, uint16_t priority, bool auto_start, uint32_t sack_size, std::function <void()> callback, uint8_t core_id) :
                     abstract::task(auto_start),
                     callback(callback)
                     {
