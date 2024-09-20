@@ -34,10 +34,20 @@ namespace freertos {
                 return this->data;
             }
 
+            void use(void (*callback)(DATA_TYPE&)){
+                lock_guard guard(*this->semaphore);
+                callback(this->data);
+            }
+
             template <typename ARGUMENT_TYPE>
             void use(ARGUMENT_TYPE arguments, void (*callback)(DATA_TYPE&, ARGUMENT_TYPE)){
                 lock_guard guard(*this->semaphore);
                 callback(this->data, arguments);
+            }
+
+            void use_from_isr(void (*callback)(DATA_TYPE&)){
+                lock_guard_from_isr guard(*this->semaphore);
+                callback(this->data);
             }
 
             template <typename ARGUMENT_TYPE>
