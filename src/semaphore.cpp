@@ -33,7 +33,7 @@ bool semaphore::take(uint32_t timeout_ms) {
         return false;
     }
 
-    uint32_t ticks = 1;
+    uint32_t ticks = max_delay_ms;
     if (timeout_ms != max_delay_ms){
         ticks = pdMS_TO_TICKS(timeout_ms);
     }
@@ -45,7 +45,7 @@ bool semaphore::take(uint32_t timeout_ms) {
 }
 
 bool semaphore::give_from_isr(void) {
-    if (!this->is_valid() || this->semaphore_type == type::recursive){
+    if (!this->is_valid() || this->semaphore_type == type::recursive || this->semaphore_type == type::mutex){
         return false;
     }
 
@@ -53,7 +53,7 @@ bool semaphore::give_from_isr(void) {
 }
 
 bool semaphore::take_from_isr(void) {
-    if (!this->is_valid() || this->semaphore_type == type::recursive){
+    if (!this->is_valid() || this->semaphore_type == type::recursive || this->semaphore_type == type::mutex){
         return false;
     }
 
