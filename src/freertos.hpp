@@ -20,6 +20,7 @@
 #include "lock_guard.hpp"
 #include "lock_guard_from_isr.hpp"
 #include "shared_data.hpp"
+#include "shared_data_with_isr.hpp"
 
 #include "this_task.hpp"
 #include "task.hpp"

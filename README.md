@@ -13,7 +13,7 @@ FreeRTOS++ is an extension of FreeRTOS encapsulated in modern design patterns us
 
 To use FreeRTOS++, simply include the necessary headers and link the library with your project. Ensure compatibility with your version of FreeRTOS and configure according to your embedded system's requirements.
 
-### Example
+### Example 01
 
 ```cpp
 #include <Arduino.h>
@@ -126,3 +126,116 @@ void setup() {
 void loop() {
     freertos::this_task::sleep(1000);
 }
+```
+
+### Example 02
+
+```cpp
+#include <Arduino.h>
+#include "etl/delegate.h"
+#include "etl/string.h"
+#include "etl/type_traits.h"
+#include "freertos.hpp"
+#include "esp_timer.h"
+
+class my_app : public freertos::abstract::app {
+    private:
+        static constexpr const char* name = "Test";
+        static constexpr uint32_t stack_size = 4 * 1024;
+        static constexpr uint16_t priority = 1;
+
+        freertos::stack::task<stack_size, my_app&> task;
+
+        static void main(my_app& app);
+        my_app() : freertos::abstract::app(task), task(my_app::name, my_app::priority, false, *this, my_app::main) {}
+    public:
+        static my_app& instance(void){
+            static my_app instance;
+            return instance;
+        }
+
+        freertos::stack::shared_data_with_isr<int>* count {nullptr};
+};
+
+void my_app::main(my_app& app){
+    while(1){
+        app.count->use([](int& count){
+            Serial.printf("Count 1: %d\n", count);
+            freertos::this_app::sleep(10000);
+        });
+        freertos::this_app::sleep(1000);
+    }
+}
+
+class my_app_2 : public freertos::abstract::app {
+    private:
+        static constexpr const char* name = "Test_2";
+        static constexpr uint32_t stack_size = 4 * 1024;
+        static constexpr uint16_t priority = 1;
+
+        freertos::stack::task<stack_size, my_app_2&> task;
+
+        static void main(my_app_2& app);
+        my_app_2() : freertos::abstract::app(task), task(my_app_2::name, my_app_2::priority, false, *this, my_app_2::main) {}
+    public:
+        static my_app_2& instance(void){
+            static my_app_2 instance;
+            return instance;
+        }
+
+        freertos::stack::shared_data_with_isr<int>* count {nullptr};
+};
+
+void my_app_2::main(my_app_2& app){
+    while(1){
+        app.count->use([](int& count){
+            Serial.printf("Count 2: %d\n", count);
+        });
+        freertos::this_app::sleep(100);
+    }
+}
+
+void IRAM_ATTR on_timer(void* param) {
+    static auto* count_ptr = static_cast<freertos::stack::shared_data_with_isr<int>*>(param);
+    if (count_ptr == nullptr) {
+        return;
+    }
+    
+    count_ptr->use_from_isr([](int& count){    
+        ESP_DRAM_LOGE("TIMER", "Timer triggered");
+        count++;
+    });
+}
+
+void setup_timer(freertos::stack::shared_data_with_isr<int>* count_ptr) {
+    esp_timer_create_args_t global_time_configs = {
+        .callback = &on_timer,
+        .arg = count_ptr,
+        .dispatch_method = ESP_TIMER_ISR,
+        .name = "HardTimer",
+        .skip_unhandled_events = false
+    };
+
+    esp_timer_handle_t global_timer_handle;
+    ESP_ERROR_CHECK(esp_timer_create(&global_time_configs, &global_timer_handle));
+    ESP_ERROR_CHECK(esp_timer_start_periodic(global_timer_handle, 100000));
+}
+
+void setup() {
+    static freertos::stack::shared_data_with_isr<int> count;
+
+    my_app::instance().count = &count;
+    my_app::instance().start();
+
+    my_app_2::instance().count = &count;
+    my_app_2::instance().start();
+
+    Serial.begin(115200);
+
+    setup_timer(&count);
+}
+
+void loop() {
+    freertos::this_task::suspend();
+}
+```

@@ -10,8 +10,6 @@ namespace freertos {
 
             using abstract::semaphore::give;
             using abstract::semaphore::take;
-            using abstract::semaphore::give_from_isr;
-            using abstract::semaphore::take_from_isr;
             using abstract::semaphore::is_valid;
         };
     }
@@ -25,8 +23,6 @@ namespace freertos {
 
             using abstract::semaphore::give;
             using abstract::semaphore::take;
-            using abstract::semaphore::give_from_isr;
-            using abstract::semaphore::take_from_isr;
             using abstract::semaphore::is_valid;
         };
     }
