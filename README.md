@@ -239,3 +239,50 @@ void loop() {
     freertos::this_task::suspend();
 }
 ```
+
+### Example 03
+
+```cpp
+#include <Arduino.h>
+#include "etl/delegate.h"
+#include "etl/string.h"
+#include "etl/type_traits.h"
+#include "freertos.hpp"
+#include "esp_timer.h"
+#include "esp_log.h"
+
+using namespace freertos;
+
+void setup() {
+    static stack::task<2048> task_1("task_1", 0, true, []() {
+        while(1){
+            ESP_LOGI("task_1", "free stack memory: %d", this_task::get_free_stack_memory());
+
+            uint32_t notification = 0;
+            if (this_task::get_notification(notification, 0, 100)) {
+                ESP_LOGE("task_1", "received: %d", notification);
+            }
+
+            this_task::suspend();
+        }
+    });
+
+    static stack::task<2048, abstract::task&> task_2("task_2", 0, true, task_1, [](abstract::task& task) {
+        static uint32_t notification = 0;
+        while(1){
+            ESP_LOGI("task_2", "free stack memory: %d", this_task::get_free_stack_memory());
+
+            if (task.notify().send_value(notification, 0, true)){
+                ESP_LOGE("task_2", "send: %d", notification);
+                notification++;
+            }
+
+            this_task::sleep(1000);
+        }
+    });
+}
+
+void loop() {
+    this_task::suspend();
+}
+```
