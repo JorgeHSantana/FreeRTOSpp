@@ -8,6 +8,7 @@
 
 namespace freertos {
     using namespace constants;
+    using namespace typedefs;
 
     class this_task {
         public:
@@ -43,5 +44,8 @@ namespace freertos {
                     this_task::suspend();
                 }
             }
+
+            static bool get_notification(uint32_t& notification_value, u_base_type index = 0, uint32_t timeout_ms = max_delay_ms);
+            static uint32_t get_free_stack_memory(void);
     };
 }

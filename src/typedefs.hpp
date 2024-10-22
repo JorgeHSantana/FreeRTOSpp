@@ -17,5 +17,7 @@ namespace freertos {
         using task_stack = StackType_t;
         using timer_handle = TimerHandle_t;
         using timer_struct = StaticTimer_t;
+        using u_base_type = UBaseType_t;
+        using base_type = BaseType_t;
     }
 }
