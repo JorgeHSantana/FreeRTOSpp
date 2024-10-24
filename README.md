@@ -42,6 +42,7 @@ class my_app : public freertos::abstract::app {
 void my_app::main(freertos::abstract::app& app){
     while(1){
         Serial.println("Hello World");
+        freertos::this_app::delay(200);
     }
 }
 
@@ -65,14 +66,15 @@ void setup() {
 
         freertos::stack::mutex mutex;
         while (true) {
-            
-            if (param > 20) {
+            int param_buf = param.get();
+
+            if (param_buf > 20) {
                 return;
             }
 
             Serial.printf("Task running: %d\n", param.get());
 
-            param = param + 1;
+            param.set(param_buf + 1);
             
             freertos::this_task::delay(250);
         }
