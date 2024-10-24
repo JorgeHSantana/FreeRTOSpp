@@ -74,7 +74,7 @@ void setup() {
 
             param = param + 1;
             
-            freertos::this_task::sleep(250);
+            freertos::this_task::delay(250);
         }
     });
 
@@ -96,7 +96,7 @@ void setup() {
                 arg.task.resume();
             }
             Serial.printf("Hello World!\n");
-            freertos::this_task::sleep(1000);
+            freertos::this_task::delay(1000);
         }
     });
 
@@ -104,7 +104,7 @@ void setup() {
     static freertos::heap::task<> heap_task("heap_task", 1, true, 2048, [&]() {
         while(true){
             Serial.printf("Heap Task: %d\n", heap_data);
-            freertos::this_task::sleep(1000);
+            freertos::this_task::delay(1000);
             heap_data++;
         }
     });
@@ -124,7 +124,7 @@ void setup() {
 }
 
 void loop() {
-    freertos::this_task::sleep(1000);
+    freertos::this_task::delay(1000);
 }
 ```
 
@@ -161,9 +161,9 @@ void my_app::main(my_app& app){
     while(1){
         app.count->use([](int& count){
             Serial.printf("Count 1: %d\n", count);
-            freertos::this_app::sleep(10000);
+            freertos::this_app::delay(10000);
         });
-        freertos::this_app::sleep(1000);
+        freertos::this_app::delay(1000);
     }
 }
 
@@ -191,7 +191,7 @@ void my_app_2::main(my_app_2& app){
         app.count->use([](int& count){
             Serial.printf("Count 2: %d\n", count);
         });
-        freertos::this_app::sleep(100);
+        freertos::this_app::delay(100);
     }
 }
 
@@ -277,7 +277,7 @@ void setup() {
                 notification++;
             }
 
-            this_task::sleep(1000);
+            this_task::delay(1000);
         }
     });
 }
