@@ -57,7 +57,7 @@ bool task::join(uint32_t observer_delay_ms, uint32_t timeout_ms) {
         return false;
     }
 
-    return this_task::sleep_for<task&>(*this, [](task& self) -> bool {
+    return this_task::delay_for<task&>(*this, [](task& self) -> bool {
         return !self.is_running();
     }, observer_delay_ms, timeout_ms);
 }
@@ -66,29 +66,12 @@ bool task::is_valid(void) {
     return this->handle != nullptr;
 }
 
-uint32_t task::get_stack_memory_size(void) {
-    return this->stack_size;
+task::notifier task::get_notifier(void) {
+    return task::notifier(this->handle);
 }
 
-uint32_t task::get_free_stack_memory(void) {
-    if (!this->is_valid()) {
-        return 0;
-    }
-
-    return uxTaskGetStackHighWaterMark(this->handle) * sizeof(task_stack);
-}
-
-uint32_t task::get_used_stack_memory(void) {
-    if (!this->is_valid()) {
-        return 0;
-    }
-
-    return this->get_stack_memory_size() - this->get_free_stack_memory();
-}
-
-task::notifier task::notify(void) {
-    static task::notifier buffer(this->handle);
-    return buffer;
+task::info task::get_info(void) {
+    return task::info(this->handle);
 }
 
 task::notifier::notifier(task_handle handle) : handle(handle) {}
@@ -302,4 +285,93 @@ bool task::notifier::clear_from_isr(u_base_type index, bool resume) {
 
 uint32_t task::notifier::get_last_value(void) const {
     return this->last_value;
+}
+
+task::info::info(task_handle handle) : handle(handle) {
+    vTaskGetInfo(this->handle, &this->status, pdTRUE, eInvalid);
+}
+
+uint16_t task::info::get_priority(void) const {
+    return this->status.uxCurrentPriority;
+}
+
+uint16_t task::info::get_base_priority(void) const {
+    return this->status.uxBasePriority;
+}
+
+uint32_t task::info::get_free_stack_memory(void) const {
+    return this->status.usStackHighWaterMark * sizeof(task_stack);
+}
+
+task::info::state task::info::get_state(void) const {
+    switch (this->status.eCurrentState) {
+        case eReady:
+            return state::ready;
+        case eRunning:
+            return state::running;
+        case eBlocked:
+            return state::blocked;
+        case eSuspended:
+            return state::suspended;
+        case eDeleted:
+            return state::deleted;
+        default:
+            return state::invalid;
+    }
+}
+
+uint32_t task::info::get_core_id(void) const {
+    return this->status.xCoreID;
+}
+
+const char* task::info::get_name(void) const {
+    return pcTaskGetName(this->handle);
+}
+
+bool task::info::is_ready(void) const {
+    return this->status.eCurrentState == eReady;
+}
+
+bool task::info::is_running(void) const {
+    return this->status.eCurrentState == eRunning;
+}
+
+bool task::info::is_blocked(void) const {
+    return this->status.eCurrentState == eBlocked;
+}
+
+bool task::info::is_suspended(void) const {
+    return this->status.eCurrentState == eSuspended;
+}
+
+bool task::info::is_deleted(void) const {
+    return this->status.eCurrentState == eDeleted;
+}
+
+bool task::info::is_invalid(void) const {
+    return this->status.eCurrentState == eInvalid;
+}
+
+void task::self::suspend(void) {
+    vTaskSuspend(nullptr);
+}
+
+void task::self::yield(void) {
+    taskYIELD();
+}
+
+void task::self::delay(uint32_t time_ms) {
+    vTaskDelay(pdMS_TO_TICKS(time_ms));
+}
+
+bool task::self::get_notification(uint32_t& notification_value, u_base_type index, uint32_t timeout_ms) {
+    if (index > constants::max_notifications){
+        return false;
+    }
+    
+    return xTaskNotifyWaitIndexed(index, 0x00, 0xFFFFFFFF, &notification_value, pdMS_TO_TICKS(timeout_ms)) == pdPASS;
+}
+
+task::info task::self::get_info(void) {
+    return task::info(xTaskGetCurrentTaskHandle());
 }

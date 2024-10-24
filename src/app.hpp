@@ -1,7 +1,6 @@
 #pragma once
 
 #include "task.hpp"
-#include "this_task.hpp"
 
 namespace freertos {
     namespace abstract {

@@ -22,7 +22,6 @@
 #include "shared_data.hpp"
 #include "shared_data_with_isr.hpp"
 
-#include "this_task.hpp"
 #include "task.hpp"
 
 #include "this_app.hpp"

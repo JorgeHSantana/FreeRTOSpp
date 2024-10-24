@@ -2,18 +2,52 @@
 
 #include "constants.hpp"
 #include "typedefs.hpp"
-#include "this_task.hpp"
 #include <functional>
 
 namespace freertos {
-
     using namespace constants;
     using namespace typedefs;
 
     namespace abstract {
         class task {
-            public:
+            public:               
+                class info {
+                    public:
+                        enum class state {
+                            ready = eReady,
+                            running = eRunning,
+                            blocked = eBlocked,
+                            suspended = eSuspended,
+                            deleted = eDeleted,
+                            invalid = eInvalid
+                        };
+                    private:
+                        task_handle handle {nullptr};
+                        TaskStatus_t status;
+                        
+                        info(task_handle handle);
+
+                        friend class task;
+                        friend class self;
+                    public:
+                        uint16_t get_priority(void) const;
+                        uint16_t get_base_priority(void) const;
+                        uint32_t get_free_stack_memory(void) const;
+                        state get_state(void) const;
+                        
+                        uint32_t get_core_id(void) const;
+
+
+                        const char* get_name(void) const;
+                        bool is_ready(void) const;
+                        bool is_running(void) const;
+                        bool is_blocked(void) const;
+                        bool is_suspended(void) const;
+                        bool is_deleted(void) const;
+                        bool is_invalid(void) const;
+                };            
                 class notifier {
+                    
                     private:
                         task_handle handle {nullptr};
                         uint32_t last_value {0};
@@ -40,6 +74,45 @@ namespace freertos {
                         bool clear_from_isr(u_base_type index = 0, bool resume = true);
 
                         uint32_t get_last_value(void) const;
+                };               
+                class self {
+                    public:
+                        static void suspend(void);
+                        static void yield(void);
+                        static void delay(uint32_t time_ms);
+                        static bool get_notification(uint32_t& notification_value, u_base_type index = 0, uint32_t timeout_ms = max_delay_ms);
+                        static info get_info(void);
+
+                        template <typename ARGUMENT_TYPE>
+                        static bool delay_for(ARGUMENT_TYPE arguments, bool (*condition)(ARGUMENT_TYPE), uint32_t observer_delay_ms = 100, uint32_t timeout_ms = max_delay_ms){
+                            if (condition == nullptr) {
+                                return false;
+                            }
+                            
+                            if (observer_delay_ms > timeout_ms || observer_delay_ms == 0) {
+                                observer_delay_ms = 100;
+                            }
+
+                            uint32_t start_time = xTaskGetTickCount();
+                            uint32_t timeout_ticks = pdMS_TO_TICKS(timeout_ms);
+
+                            while (!condition(arguments)) {
+                                if (timeout_ms != max_delay_ms && (xTaskGetTickCount() - start_time >= timeout_ticks)) {
+                                    return false;
+                                }
+                                vTaskDelay(pdMS_TO_TICKS(observer_delay_ms));
+                            }
+
+                            return true;
+                        }
+
+                        template <typename ARGUMENT_TYPE>
+                        static void suspend_for(ARGUMENT_TYPE arguments, bool (*condition)(ARGUMENT_TYPE)){
+                            while (condition != nullptr && condition(arguments)) {
+                                vTaskSuspend(nullptr);
+                            }
+                        }
+
                 };
             protected:
                 task_handle handle {nullptr};
@@ -56,11 +129,8 @@ namespace freertos {
                 bool is_running(void);
                 bool join(uint32_t observer_delay_ms = 100, uint32_t timeout_ms = max_delay_ms);
                 bool is_valid(void);
-                notifier notify(void);
-                uint32_t get_stack_memory_size(void);
-                uint32_t get_free_stack_memory(void);
-                uint32_t get_used_stack_memory(void);
-
+                notifier get_notifier(void);
+                info get_info(void);
         };
     }
 
@@ -84,7 +154,7 @@ namespace freertos {
                     task& self = *static_cast<task*>(arguments);
 
                     if (!self.auto_start){
-                        this_task::suspend();
+                        vTaskSuspend(nullptr);
                     }
 
                     while (1) {
@@ -92,7 +162,7 @@ namespace freertos {
                             self.callback(self.arguments);
                         }
 
-                        this_task::suspend();
+                        vTaskSuspend(nullptr);
                     }
                 }
 
@@ -128,10 +198,8 @@ namespace freertos {
                 using abstract::task::is_running;
                 using abstract::task::join;
                 using abstract::task::is_valid;
-                using abstract::task::notify;
-                using abstract::task::get_stack_memory_size;
-                using abstract::task::get_free_stack_memory;
-                using abstract::task::get_used_stack_memory;
+                using abstract::task::get_notifier;
+                using abstract::task::get_info;
         };
 
         template <uint32_t STACK_SIZE>
@@ -150,15 +218,15 @@ namespace freertos {
                     task& self = *static_cast<task*>(arguments);
 
                     if (!self.auto_start){
-                        this_task::suspend();
+                        vTaskSuspend(nullptr);
                     }
 
                     while (1) {
                         if (self.callback != nullptr) {
                             self.callback();
                         }
-
-                        this_task::suspend();
+                        
+                        vTaskSuspend(nullptr);
                     }
                 }
 
@@ -192,10 +260,8 @@ namespace freertos {
                 using abstract::task::is_running;
                 using abstract::task::join;
                 using abstract::task::is_valid;
-                using abstract::task::notify;
-                using abstract::task::get_stack_memory_size;
-                using abstract::task::get_free_stack_memory;
-                using abstract::task::get_used_stack_memory;
+                using abstract::task::get_notifier;
+                using abstract::task::get_info;
         };
     }
 
@@ -217,7 +283,7 @@ namespace freertos {
                     task& self = *static_cast<task*>(arguments);
 
                     if (!self.auto_start){
-                        this_task::suspend();
+                        vTaskSuspend(nullptr);
                     }
 
                     while (1) {
@@ -225,7 +291,7 @@ namespace freertos {
                             self.callback(self.arguments);
                         }
 
-                        this_task::suspend();
+                        vTaskSuspend(nullptr);
                     }
                 }
 
@@ -261,10 +327,8 @@ namespace freertos {
                 using abstract::task::is_running;
                 using abstract::task::join;
                 using abstract::task::is_valid;
-                using abstract::task::notify;
-                using abstract::task::get_stack_memory_size;
-                using abstract::task::get_free_stack_memory;
-                using abstract::task::get_used_stack_memory;
+                using abstract::task::get_notifier;
+                using abstract::task::get_info;
         };
 
         template <>
@@ -280,7 +344,7 @@ namespace freertos {
                     task& self = *static_cast<task*>(arguments);
 
                     if (!self.auto_start){
-                        this_task::suspend();
+                        vTaskSuspend(nullptr);
                     }
 
                     while (1) {
@@ -288,7 +352,7 @@ namespace freertos {
                             self.callback();
                         }
 
-                        this_task::suspend();
+                        vTaskSuspend(nullptr);
                     }
                 }
 
@@ -322,10 +386,10 @@ namespace freertos {
                 using abstract::task::is_running;
                 using abstract::task::join;
                 using abstract::task::is_valid;
-                using abstract::task::notify;
-                using abstract::task::get_stack_memory_size;
-                using abstract::task::get_free_stack_memory;
-                using abstract::task::get_used_stack_memory;
+                using abstract::task::get_notifier;
+                using abstract::task::get_info;
         };
     }
+    
+    using this_task = abstract::task::self;
 }
