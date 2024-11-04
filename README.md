@@ -62,7 +62,7 @@ void setup() {
 
     static freertos::stack::shared_data<int> test = 10;
 
-    static freertos::stack::task<2048, freertos::abstract::shared_data<int>&> task_arg("task_arg", 1, false, test, [](freertos::abstract::shared_data<int>& param) {
+    static freertos::stack::task<2048, freertos::abstract::shared_data<int>&> task_arg("task_arg", 1, test, [](freertos::abstract::shared_data<int>& param) {
 
         freertos::stack::mutex mutex;
         while (true) {
@@ -256,7 +256,7 @@ void loop() {
 using namespace freertos;
 
 void setup() {
-    static stack::task<2048> task_1("task_1", 0, true, []() {
+    static stack::task<2048> task_1("task_1", 0, []() {
         while(1){
             ESP_LOGI("task_1", "free stack memory: %d", this_task::get_free_stack_memory());
 
@@ -269,7 +269,7 @@ void setup() {
         }
     });
 
-    static stack::task<2048, abstract::task&> task_2("task_2", 0, true, task_1, [](abstract::task& task) {
+    static stack::task<2048, abstract::task&> task_2("task_2", 0, task_1, [](abstract::task& task) {
         static uint32_t notification = 0;
         while(1){
             ESP_LOGI("task_2", "free stack memory: %d", this_task::get_free_stack_memory());
