@@ -15,4 +15,6 @@ namespace freertos {
                 bool is_running(void);
         };
     }
+
+    using this_app = this_task;
 }

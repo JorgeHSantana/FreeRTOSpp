@@ -5,7 +5,7 @@ using namespace constants;
 using namespace typedefs;
 using namespace abstract;
 
-task::task(bool auto_start, uint32_t stack_size) : auto_start(auto_start), stack_size(stack_size) {}
+task::task(uint32_t stack_size) : stack_size(stack_size) {}
 
 task::~task(void) {
     if (!this->is_valid()) {
@@ -49,7 +49,7 @@ bool task::suspend_from_isr(void) {
 }
 
 bool task::is_running(void) {
-    return this->is_valid() && eTaskGetState(this->handle) != eSuspended && eTaskGetState(this->handle) != eDeleted;
+    return this->is_valid() && eTaskGetState(this->handle) == eRunning;
 }
 
 bool task::join(uint32_t observer_delay_ms, uint32_t timeout_ms) {
@@ -72,6 +72,10 @@ task::notifier task::get_notifier(void) {
 
 task::info task::get_info(void) {
     return task::info(this->handle);
+}
+
+task_handle& task::get_handle(void) {
+    return this->handle;
 }
 
 task::notifier::notifier(task_handle handle) : handle(handle) {}

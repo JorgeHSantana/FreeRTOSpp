@@ -4,6 +4,7 @@
 
 #include "constants.hpp"
 #include "typedefs.hpp"
+#include "system.hpp"
 
 #include "collection.hpp"
 #include "fifo.hpp"
@@ -24,5 +25,4 @@
 
 #include "task.hpp"
 
-#include "this_app.hpp"
 #include "app.hpp"

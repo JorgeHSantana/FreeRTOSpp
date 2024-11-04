@@ -27,6 +27,7 @@ namespace freertos {
                 uint32_t get_expiration_time_ms(void);
                 bool is_running(void);
                 bool is_valid(void);
+                timer_handle& get_handle(void);
         };
     }
 

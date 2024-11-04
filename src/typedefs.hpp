@@ -19,5 +19,6 @@ namespace freertos {
         using timer_struct = StaticTimer_t;
         using u_base_type = UBaseType_t;
         using base_type = BaseType_t;
+        using tick_type = TickType_t;
     }
 }

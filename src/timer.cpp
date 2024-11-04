@@ -125,3 +125,7 @@ uint32_t timer::get_expiration_time_ms(void){
 
     return pdTICKS_TO_MS(xTimerGetExpiryTime(this->handle));
 }
+
+timer_handle& timer::get_handle(void){
+    return this->handle;
+}
