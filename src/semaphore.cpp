@@ -59,3 +59,7 @@ bool semaphore::take_from_isr(void) {
 
     return xSemaphoreTakeFromISR(this->handle, nullptr) == pdTRUE;
 }
+
+semaphore_handle& semaphore::get_handle(void) {
+    return this->handle;
+}

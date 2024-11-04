@@ -62,7 +62,7 @@ namespace freertos {
                     ticks = pdMS_TO_TICKS(timeout_ms);
                 }
 
-                if (this->overwrite_if_full && this->mode != send_mode::single && this->is_queue_full()){
+                if (this->overwrite_if_full && this->mode != send_mode::single && this->is_full()){
                     DATA_TYPE buffer;
                     if (this->pop(buffer, timeout_ms) == false){
                         return false;
@@ -85,7 +85,7 @@ namespace freertos {
                     return false;
                 }
 
-                if (this->overwrite_if_full && this->mode != send_mode::single && this->is_queue_full_from_isr()){
+                if (this->overwrite_if_full && this->mode != send_mode::single && this->is_full_from_isr()){
                     DATA_TYPE buffer;
                     if (this->pop_from_isr(buffer) == false){
                         return false;
@@ -103,19 +103,19 @@ namespace freertos {
                 return uxQueueSpacesAvailable(this->handle);
             }
 
-            bool is_queue_empty(void) const {
+            bool is_empty(void) const {
                 return (this->get_free_space() == this->storage_size);
             }
 
-            bool is_queue_full(void) const {
+            bool is_full(void) const {
                 return (this->get_free_space() == 0);
             }
 
-            bool is_queue_empty_from_isr(void) const {
+            bool is_empty_from_isr(void) const {
                 return xQueueIsQueueEmptyFromISR(this->handle);
             }
 
-            bool is_queue_full_from_isr(void) const {
+            bool is_full_from_isr(void) const {
                 return xQueueIsQueueFullFromISR(this->handle);
             }
 
@@ -133,6 +133,10 @@ namespace freertos {
 
             uint32_t get_storage_size(void){
                 return this->storage_size;
+            }
+
+            queue_handle& get_handle(void) {
+                return this->handle;
             }
         };
     }

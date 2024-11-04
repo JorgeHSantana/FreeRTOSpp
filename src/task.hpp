@@ -116,10 +116,9 @@ namespace freertos {
                 };
             protected:
                 task_handle handle {nullptr};
-                bool auto_start {false};
                 uint32_t stack_size {0};
 
-                task(bool auto_start = false, uint32_t stack_size = 0);
+                task(uint32_t stack_size = 0);
             public:
                 ~task();
                 bool resume(void);
@@ -131,6 +130,7 @@ namespace freertos {
                 bool is_valid(void);
                 notifier get_notifier(void);
                 info get_info(void);
+                task_handle& get_handle(void);
         };
     }
 
@@ -146,16 +146,12 @@ namespace freertos {
                 ARGUMENT_TYPE arguments;
                 void (*callback)(ARGUMENT_TYPE);
 
-                static void wrapper(void* arguments){
+                static void wrapper(void* arguments) {
                     if (arguments == nullptr) {
                         return;
                     }
 
                     task& self = *static_cast<task*>(arguments);
-
-                    if (!self.auto_start){
-                        vTaskSuspend(nullptr);
-                    }
 
                     while (1) {
                         if (self.callback != nullptr) {
@@ -167,29 +163,21 @@ namespace freertos {
                 }
 
             public:
-                task(const char* name, uint16_t priority, bool auto_start, ARGUMENT_TYPE param, void (*callback)(ARGUMENT_TYPE)) :
-                abstract::task(auto_start, STACK_SIZE),
+                task(const char* name, uint16_t priority, ARGUMENT_TYPE param, void (*callback)(ARGUMENT_TYPE)) :
+                abstract::task(STACK_SIZE),
                 arguments(param), 
                 callback(callback) 
                 {
-                    this->handle = xTaskCreateStatic(wrapper, name, STACK_SIZE, this, this->auto_start ? priority : constants::max_priority, stack, &buffer);
-                    if (this->handle != nullptr && !this->auto_start) {
-                        this->join();
-                        vTaskPrioritySet(this->handle, priority);
-                    }
+                    this->handle = xTaskCreateStatic(wrapper, name, STACK_SIZE, this, priority, stack, &buffer);
                 }
 
                 #if defined(ESP32)
-                    task(const char* name, uint16_t priority, bool auto_start, ARGUMENT_TYPE param, void (*callback)(ARGUMENT_TYPE), uint8_t core_id) :
-                    abstract::task(auto_start, STACK_SIZE),
+                    task(const char* name, uint16_t priority, ARGUMENT_TYPE param, void (*callback)(ARGUMENT_TYPE), uint8_t core_id) :
+                    abstract::task(STACK_SIZE),
                     arguments(param),
                     callback(callback)
                     {
-                        this->handle = xTaskCreateStaticPinnedToCore(wrapper, name, STACK_SIZE, this, this->auto_start ? priority : constants::max_priority, stack, &buffer, core_id);
-                        if (this->handle != nullptr && !this->auto_start) {
-                            this->join();
-                            vTaskPrioritySet(this->handle, priority);
-                        }
+                        this->handle = xTaskCreateStaticPinnedToCore(wrapper, name, STACK_SIZE, this, priority, stack, &buffer, core_id);
                     }
                 #endif
 
@@ -200,6 +188,7 @@ namespace freertos {
                 using abstract::task::is_valid;
                 using abstract::task::get_notifier;
                 using abstract::task::get_info;
+                using abstract::task::get_handle;
         };
 
         template <uint32_t STACK_SIZE>
@@ -217,10 +206,6 @@ namespace freertos {
 
                     task& self = *static_cast<task*>(arguments);
 
-                    if (!self.auto_start){
-                        vTaskSuspend(nullptr);
-                    }
-
                     while (1) {
                         if (self.callback != nullptr) {
                             self.callback();
@@ -231,27 +216,19 @@ namespace freertos {
                 }
 
             public:
-                task(const char* name, uint16_t priority, bool auto_start, void (*callback)(void)) :
-                abstract::task(auto_start, STACK_SIZE),
+                task(const char* name, uint16_t priority, void (*callback)(void)) :
+                abstract::task(STACK_SIZE),
                 callback(callback)
                 {
-                    this->handle = xTaskCreateStatic(wrapper, name, STACK_SIZE, this, this->auto_start ? priority : constants::max_priority, stack, &buffer);
-                    if (this->handle != nullptr && !this->auto_start) {
-                        this->join();
-                        vTaskPrioritySet(this->handle, priority);
-                    }
+                    this->handle = xTaskCreateStatic(wrapper, name, STACK_SIZE, this, priority, stack, &buffer);
                 }
 
                 #if defined(ESP32)
-                    task(const char* name, uint16_t priority, bool auto_start, void (*callback)(void), uint8_t core_id) :
-                    abstract::task(auto_start, STACK_SIZE),
+                    task(const char* name, uint16_t priority, void (*callback)(void), uint8_t core_id) :
+                    abstract::task(STACK_SIZE),
                     callback(callback)
                     {
-                        this->handle = xTaskCreateStaticPinnedToCore(wrapper, name, STACK_SIZE, this, this->auto_start ? priority : constants::max_priority, stack, &buffer, core_id);
-                        if (this->handle != nullptr && !this->auto_start) {
-                            this->join();
-                            vTaskPrioritySet(this->handle, priority);
-                        }
+                        this->handle = xTaskCreateStaticPinnedToCore(wrapper, name, STACK_SIZE, this, priority, stack, &buffer, core_id);
                     }
                 #endif
                 
@@ -262,6 +239,7 @@ namespace freertos {
                 using abstract::task::is_valid;
                 using abstract::task::get_notifier;
                 using abstract::task::get_info;
+                using abstract::task::get_handle;
         };
     }
 
@@ -282,10 +260,6 @@ namespace freertos {
 
                     task& self = *static_cast<task*>(arguments);
 
-                    if (!self.auto_start){
-                        vTaskSuspend(nullptr);
-                    }
-
                     while (1) {
                         if (self.callback != nullptr) {
                             self.callback(self.arguments);
@@ -296,29 +270,21 @@ namespace freertos {
                 }
 
             public:
-                task(const char* name, uint16_t priority, bool auto_start, uint32_t stack_size, ARGUMENT_TYPE param, void (*callback)(ARGUMENT_TYPE)) :
-                abstract::task(auto_start, stack_size),
+                task(const char* name, uint16_t priority, uint32_t stack_size, ARGUMENT_TYPE param, void (*callback)(ARGUMENT_TYPE)) :
+                abstract::task(stack_size),
                 arguments(param), 
                 callback(callback) 
                 {
-                    BaseType_t status = xTaskCreate(wrapper, name, stack_size, this, this->auto_start ? priority : constants::max_priority, &this->handle) == pdPASS;
-                    if (status == pdPASS && !this->auto_start) {
-                        this->join();
-                        vTaskPrioritySet(this->handle, priority);
-                    }
+                    xTaskCreate(wrapper, name, stack_size, this, priority, &this->handle);
                 }
 
                 #if defined(ESP32)
-                    task(const char* name, uint16_t priority, bool auto_start, uint32_t stack_size, ARGUMENT_TYPE param, void (*callback)(ARGUMENT_TYPE), uint8_t core_id) :
-                    abstract::task(auto_start, stack_size),
+                    task(const char* name, uint16_t priority, uint32_t stack_size, ARGUMENT_TYPE param, void (*callback)(ARGUMENT_TYPE), uint8_t core_id) :
+                    abstract::task(stack_size),
                     arguments(param),
                     callback(callback)
                     {
-                        BaseType_t status = xTaskCreatePinnedToCore(wrapper, name, stack_size, this, this->auto_start ? priority : constants::max_priority, &this->handle, core_id) == pdPASS;
-                        if (status == pdPASS && !this->auto_start) {
-                            this->join();
-                            vTaskPrioritySet(this->handle, priority);
-                        }
+                        xTaskCreatePinnedToCore(wrapper, name, stack_size, this, priority, &this->handle, core_id);
                     }
                 #endif
 
@@ -329,6 +295,7 @@ namespace freertos {
                 using abstract::task::is_valid;
                 using abstract::task::get_notifier;
                 using abstract::task::get_info;
+                using abstract::task::get_handle;
         };
 
         template <>
@@ -343,10 +310,6 @@ namespace freertos {
 
                     task& self = *static_cast<task*>(arguments);
 
-                    if (!self.auto_start){
-                        vTaskSuspend(nullptr);
-                    }
-
                     while (1) {
                         if (self.callback != nullptr) {
                             self.callback();
@@ -357,27 +320,19 @@ namespace freertos {
                 }
 
             public:
-                task(const char* name, uint16_t priority, bool auto_start, uint32_t stack_size, std::function <void()> callback) :
-                abstract::task(auto_start, stack_size),
+                task(const char* name, uint16_t priority, uint32_t stack_size, std::function <void()> callback) :
+                abstract::task(stack_size),
                 callback(callback)
                 {
-                    BaseType_t status = xTaskCreate(wrapper, name, stack_size, this, this->auto_start ? priority : constants::max_priority, &this->handle) == pdPASS;
-                    if (status == pdPASS && !this->auto_start) {
-                        this->join();
-                        vTaskPrioritySet(this->handle, priority);
-                    }
+                    xTaskCreate(wrapper, name, stack_size, this, priority, &this->handle);
                 }
                 
                 #if defined(ESP32)
-                    task(const char* name, uint16_t priority, bool auto_start, uint32_t stack_size, std::function <void()> callback, uint8_t core_id) :
-                    abstract::task(auto_start, stack_size),
+                    task(const char* name, uint16_t priority, uint32_t stack_size, std::function <void()> callback, uint8_t core_id) :
+                    abstract::task(stack_size),
                     callback(callback)
                     {
-                        BaseType_t status = xTaskCreatePinnedToCore(wrapper, name, stack_size, this, this->auto_start ? priority : constants::max_priority, &this->handle, core_id) == pdPASS;
-                        if (status == pdPASS && !this->auto_start) {
-                            this->join();
-                            vTaskPrioritySet(this->handle, priority);
-                        }
+                        xTaskCreatePinnedToCore(wrapper, name, stack_size, this, priority, &this->handle, core_id);
                     }
                 #endif
 
@@ -388,6 +343,7 @@ namespace freertos {
                 using abstract::task::is_valid;
                 using abstract::task::get_notifier;
                 using abstract::task::get_info;
+                using abstract::task::get_handle;
         };
     }
     

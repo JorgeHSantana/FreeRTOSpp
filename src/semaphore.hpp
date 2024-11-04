@@ -26,6 +26,7 @@ namespace freertos {
         public:
             ~semaphore(void);
             bool is_valid(void) const;
+            semaphore_handle& get_handle(void);
 
             virtual bool give(void);
             virtual bool take(uint32_t timeout_ms = max_delay_ms);

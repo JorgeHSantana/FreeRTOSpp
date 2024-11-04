@@ -11,6 +11,7 @@ namespace freertos {
             using abstract::semaphore::give;
             using abstract::semaphore::take;
             using abstract::semaphore::is_valid;
+            using abstract::semaphore::get_handle;
         };
     }
 
@@ -24,6 +25,7 @@ namespace freertos {
             using abstract::semaphore::give;
             using abstract::semaphore::take;
             using abstract::semaphore::is_valid;
+            using abstract::semaphore::get_handle;
         };
     }
 }

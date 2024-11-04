@@ -27,12 +27,13 @@ namespace freertos {
             using abstract::collection<DATA_TYPE>::get_free_space;
             using abstract::collection<DATA_TYPE>::clear;
             using abstract::collection<DATA_TYPE>::is_valid;
-            using abstract::collection<DATA_TYPE>::is_queue_empty;
-            using abstract::collection<DATA_TYPE>::is_queue_full;
-            using abstract::collection<DATA_TYPE>::is_queue_empty_from_isr;
-            using abstract::collection<DATA_TYPE>::is_queue_full_from_isr;
+            using abstract::collection<DATA_TYPE>::is_empty;
+            using abstract::collection<DATA_TYPE>::is_full;
+            using abstract::collection<DATA_TYPE>::is_empty_from_isr;
+            using abstract::collection<DATA_TYPE>::is_full_from_isr;
             using abstract::collection<DATA_TYPE>::get_item_size;
             using abstract::collection<DATA_TYPE>::get_storage_size;
+            using abstract::collection<DATA_TYPE>::get_handle;
         };
     }
 
@@ -61,12 +62,13 @@ namespace freertos {
             using abstract::collection<DATA_TYPE>::get_free_space;
             using abstract::collection<DATA_TYPE>::clear;
             using abstract::collection<DATA_TYPE>::is_valid;
-            using abstract::collection<DATA_TYPE>::is_queue_empty;
-            using abstract::collection<DATA_TYPE>::is_queue_full;
-            using abstract::collection<DATA_TYPE>::is_queue_empty_from_isr;
-            using abstract::collection<DATA_TYPE>::is_queue_full_from_isr;
+            using abstract::collection<DATA_TYPE>::is_empty;
+            using abstract::collection<DATA_TYPE>::is_full;
+            using abstract::collection<DATA_TYPE>::is_empty_from_isr;
+            using abstract::collection<DATA_TYPE>::is_full_from_isr;
             using abstract::collection<DATA_TYPE>::get_item_size;
             using abstract::collection<DATA_TYPE>::get_storage_size;
+            using abstract::collection<DATA_TYPE>::get_handle;
         };
     }
 }
