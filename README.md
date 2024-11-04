@@ -31,7 +31,7 @@ class my_app : public freertos::abstract::app {
         freertos::stack::task<stack_size, freertos::abstract::app&> task;
 
         static void main(freertos::abstract::app& app);
-        my_app() : freertos::abstract::app(task), task(name, priority, false, *this, my_app::main) {}
+        my_app() : freertos::abstract::app(task), task(name, priority, *this, my_app::main) {}
     public:
         static my_app& instance(void){
             static my_app instance;
@@ -90,7 +90,7 @@ void setup() {
         task_arg
     };
 
-    static freertos::stack::task<2048, decltype(task_arg_struct)&> task("task", 1, true, task_arg_struct, [](decltype(task_arg_struct)& arg) {
+    static freertos::stack::task<2048, decltype(task_arg_struct)&> task("task", 1, task_arg_struct, [](decltype(task_arg_struct)& arg) {
         while (true) {
             if (!arg.task.is_running()) {
                 Serial.printf("Restarting Task!\n");
@@ -103,7 +103,7 @@ void setup() {
     });
 
     static int8_t heap_data = 0;
-    static freertos::heap::task<> heap_task("heap_task", 1, true, 2048, [&]() {
+    static freertos::heap::task<> heap_task("heap_task", 1, 2048, [&]() {
         while(true){
             Serial.printf("Heap Task: %d\n", heap_data);
             freertos::this_task::delay(1000);
@@ -149,7 +149,7 @@ class my_app : public freertos::abstract::app {
         freertos::stack::task<stack_size, my_app&> task;
 
         static void main(my_app& app);
-        my_app() : freertos::abstract::app(task), task(my_app::name, my_app::priority, false, *this, my_app::main) {}
+        my_app() : freertos::abstract::app(task), task(my_app::name, my_app::priority, *this, my_app::main) {}
     public:
         static my_app& instance(void){
             static my_app instance;
@@ -178,7 +178,7 @@ class my_app_2 : public freertos::abstract::app {
         freertos::stack::task<stack_size, my_app_2&> task;
 
         static void main(my_app_2& app);
-        my_app_2() : freertos::abstract::app(task), task(my_app_2::name, my_app_2::priority, false, *this, my_app_2::main) {}
+        my_app_2() : freertos::abstract::app(task), task(my_app_2::name, my_app_2::priority, *this, my_app_2::main) {}
     public:
         static my_app_2& instance(void){
             static my_app_2 instance;
