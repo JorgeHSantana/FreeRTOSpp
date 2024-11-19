@@ -25,11 +25,11 @@ namespace freertos {
                         task_handle handle {nullptr};
                         TaskStatus_t status;
                         
-                        info(task_handle handle);
-
                         friend class task;
                         friend class self;
                     public:
+                        info(task_handle handle);
+                        
                         uint16_t get_priority(void) const;
                         uint16_t get_base_priority(void) const;
                         uint32_t get_free_stack_memory(void) const;
@@ -51,10 +51,11 @@ namespace freertos {
                     private:
                         task_handle handle {nullptr};
                         uint32_t last_value {0};
-                        notifier(task_handle handle);
 
                         friend class task;
                     public:
+                        notifier(task_handle handle);
+                        
                         bool signal(u_base_type index = 0, bool resume = true);
                         bool signal_from_isr(u_base_type index = 0, bool resume = true);
 
@@ -77,6 +78,7 @@ namespace freertos {
                 };               
                 class self {
                     public:
+                        static task_handle get_handle(void);
                         static void suspend(void);
                         static void yield(void);
                         static void delay(uint32_t time_ms);
@@ -116,10 +118,9 @@ namespace freertos {
                 };
             protected:
                 task_handle handle {nullptr};
-                uint32_t stack_size {0};
-
-                task(uint32_t stack_size = 0);
+                task() = default;
             public:
+                task(task_handle handle);
                 ~task();
                 bool resume(void);
                 bool resume_from_isr(void);
@@ -164,7 +165,7 @@ namespace freertos {
 
             public:
                 task(const char* name, uint16_t priority, ARGUMENT_TYPE param, void (*callback)(ARGUMENT_TYPE)) :
-                abstract::task(STACK_SIZE),
+                abstract::task(),
                 arguments(param), 
                 callback(callback) 
                 {
@@ -173,7 +174,7 @@ namespace freertos {
 
                 #if defined(ESP32)
                     task(const char* name, uint16_t priority, ARGUMENT_TYPE param, void (*callback)(ARGUMENT_TYPE), uint8_t core_id) :
-                    abstract::task(STACK_SIZE),
+                    abstract::task(),
                     arguments(param),
                     callback(callback)
                     {
@@ -217,7 +218,7 @@ namespace freertos {
 
             public:
                 task(const char* name, uint16_t priority, void (*callback)(void)) :
-                abstract::task(STACK_SIZE),
+                abstract::task(),
                 callback(callback)
                 {
                     this->handle = xTaskCreateStatic(wrapper, name, STACK_SIZE, this, priority, stack, &buffer);
@@ -225,7 +226,7 @@ namespace freertos {
 
                 #if defined(ESP32)
                     task(const char* name, uint16_t priority, void (*callback)(void), uint8_t core_id) :
-                    abstract::task(STACK_SIZE),
+                    abstract::task(),
                     callback(callback)
                     {
                         this->handle = xTaskCreateStaticPinnedToCore(wrapper, name, STACK_SIZE, this, priority, stack, &buffer, core_id);
@@ -271,7 +272,7 @@ namespace freertos {
 
             public:
                 task(const char* name, uint16_t priority, uint32_t stack_size, ARGUMENT_TYPE param, void (*callback)(ARGUMENT_TYPE)) :
-                abstract::task(stack_size),
+                abstract::task(),
                 arguments(param), 
                 callback(callback) 
                 {
@@ -280,7 +281,7 @@ namespace freertos {
 
                 #if defined(ESP32)
                     task(const char* name, uint16_t priority, uint32_t stack_size, ARGUMENT_TYPE param, void (*callback)(ARGUMENT_TYPE), uint8_t core_id) :
-                    abstract::task(stack_size),
+                    abstract::task(),
                     arguments(param),
                     callback(callback)
                     {
@@ -321,7 +322,7 @@ namespace freertos {
 
             public:
                 task(const char* name, uint16_t priority, uint32_t stack_size, std::function <void()> callback) :
-                abstract::task(stack_size),
+                abstract::task(),
                 callback(callback)
                 {
                     xTaskCreate(wrapper, name, stack_size, this, priority, &this->handle);
@@ -329,7 +330,7 @@ namespace freertos {
                 
                 #if defined(ESP32)
                     task(const char* name, uint16_t priority, uint32_t stack_size, std::function <void()> callback, uint8_t core_id) :
-                    abstract::task(stack_size),
+                    abstract::task(),
                     callback(callback)
                     {
                         xTaskCreatePinnedToCore(wrapper, name, stack_size, this, priority, &this->handle, core_id);

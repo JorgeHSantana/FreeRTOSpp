@@ -5,6 +5,10 @@ using namespace abstract;
 using namespace constants;
 using namespace typedefs;
 
+timer::timer(timer_handle handle):
+handle(handle)
+{}
+
 timer::~timer(){
     if (this->handle != nullptr) {
         xTimerDelete(handle, 0);

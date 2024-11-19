@@ -14,6 +14,7 @@ namespace freertos {
         constexpr uint8_t task_name_length = configMAX_TASK_NAME_LEN;
         constexpr uint8_t max_priority = configMAX_PRIORITIES - 1;
         constexpr uint8_t max_notifications = configTASK_NOTIFICATION_ARRAY_ENTRIES - 1;
+        constexpr uint32_t min_stack_size = configMINIMAL_STACK_SIZE;
     }
     
 }
