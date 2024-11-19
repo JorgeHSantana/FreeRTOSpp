@@ -11,7 +11,9 @@ namespace freertos {
         class timer {
             protected:
                 timer_handle handle;
+                timer() = default;
             public:
+                timer(timer_handle handle);
                 ~timer();
                 bool start(uint32_t delay_ms = 0);
                 bool start_from_isr(void);
@@ -50,6 +52,7 @@ namespace freertos {
 
             public:
                 timer(const char* name, ARGUMENT_TYPE argument, void (*callback)(ARGUMENT_TYPE), uint32_t period_ms = 0, bool auto_reload = false, bool auto_start = false):
+                abstract::timer(),
                 callback(callback),
                 argument(argument)
                 {
@@ -88,6 +91,7 @@ namespace freertos {
                 }
             public:
                 timer(const char* name, void (*callback)(), uint32_t period_ms = 0, bool auto_reload = false, bool auto_start = false):
+                abstract::timer(),
                 callback(callback)
                 {
                     this->handle = xTimerCreate(name, pdMS_TO_TICKS(period_ms), auto_reload, this, &timer::callback_wrapper);
@@ -133,6 +137,7 @@ namespace freertos {
 
             public:
                 timer(const char* name, ARGUMENT_TYPE argument, void (*callback)(ARGUMENT_TYPE), uint32_t period_ms = 0, bool auto_reload = false, bool auto_start = false):
+                abstract::timer(),
                 callback(callback),
                 argument(argument)
                 {
@@ -173,6 +178,7 @@ namespace freertos {
 
             public:
                 timer(const char* name, void (*callback)(), uint32_t period_ms = 0, bool auto_reload = false, bool auto_start = false):
+                abstract::timer(),
                 callback(callback)
                 {
                     this->handle = xTimerCreateStatic(name, pdMS_TO_TICKS(period_ms), auto_reload, this, &timer::callback_wrapper, &this->buffer);

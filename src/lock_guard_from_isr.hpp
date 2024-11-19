@@ -13,15 +13,22 @@ namespace freertos {
         semaphore(semaphore)
         {
             if (semaphore.take_from_isr()){
+                this->locked = true;
                 callback(data);
             }
         }
 
         ~lock_guard_from_isr(void){
             this->semaphore.give_from_isr();
+            this->locked = false;
+        }
+
+        bool is_locked() const {
+            return this->locked;
         }
     private:
         abstract::semaphore& semaphore;
+        bool locked {false};
     };
 
     template <>
@@ -31,14 +38,21 @@ namespace freertos {
         semaphore(semaphore)
         {
             if (semaphore.take_from_isr()){
+                this->locked = true;
                 callback();
             }
         }
 
         ~lock_guard_from_isr(void){
             this->semaphore.give_from_isr();
+            this->locked = false;
+        }
+
+        bool is_locked() const {
+            return this->locked;
         }
     private:
         abstract::semaphore& semaphore;
+        bool locked {false};
     };
 }

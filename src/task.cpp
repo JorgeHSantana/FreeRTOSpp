@@ -5,7 +5,7 @@ using namespace constants;
 using namespace typedefs;
 using namespace abstract;
 
-task::task(uint32_t stack_size) : stack_size(stack_size) {}
+task::task(task_handle handle) : handle(handle) {}
 
 task::~task(void) {
     if (!this->is_valid()) {
@@ -14,7 +14,6 @@ task::~task(void) {
 
     vTaskDelete(this->handle);
     this->handle = nullptr;
-    this->stack_size = 0;
 }
 
 bool task::resume(void) {
@@ -354,6 +353,10 @@ bool task::info::is_deleted(void) const {
 
 bool task::info::is_invalid(void) const {
     return this->status.eCurrentState == eInvalid;
+}
+
+task_handle task::self::get_handle(void) {
+    return xTaskGetCurrentTaskHandle();
 }
 
 void task::self::suspend(void) {
