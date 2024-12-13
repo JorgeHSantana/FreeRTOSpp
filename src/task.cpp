@@ -206,7 +206,7 @@ bool task::notifier::overwrite_value_from_isr(uint32_t value, u_base_type index,
     }
     
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-https://www.youtube.com/watch?v=JMKi9qVrGWM
+
     if (xTaskNotifyAndQueryIndexedFromISR(this->handle, index, value, eSetValueWithOverwrite, &this->last_value, &xHigherPriorityTaskWoken) != pdPASS){
         return false;
     }
