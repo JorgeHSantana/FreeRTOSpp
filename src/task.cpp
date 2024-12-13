@@ -206,7 +206,7 @@ bool task::notifier::overwrite_value_from_isr(uint32_t value, u_base_type index,
     }
     
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-
+https://www.youtube.com/watch?v=JMKi9qVrGWM
     if (xTaskNotifyAndQueryIndexedFromISR(this->handle, index, value, eSetValueWithOverwrite, &this->last_value, &xHigherPriorityTaskWoken) != pdPASS){
         return false;
     }
@@ -323,9 +323,11 @@ task::info::state task::info::get_state(void) const {
     }
 }
 
-uint32_t task::info::get_core_id(void) const {
-    return this->status.xCoreID;
-}
+#if configTASKLIST_INCLUDE_COREID
+    uint32_t task::info::get_core_id(void) const {
+        return this->status.xCoreID;
+    }
+#endif
 
 const char* task::info::get_name(void) const {
     return pcTaskGetName(this->handle);

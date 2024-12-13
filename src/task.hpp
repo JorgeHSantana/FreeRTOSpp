@@ -35,8 +35,9 @@ namespace freertos {
                         uint32_t get_free_stack_memory(void) const;
                         state get_state(void) const;
                         
-                        uint32_t get_core_id(void) const;
-
+                        #if configTASKLIST_INCLUDE_COREID
+                            uint32_t get_core_id(void) const;
+                        #endif
 
                         const char* get_name(void) const;
                         bool is_ready(void) const;
