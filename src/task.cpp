@@ -48,7 +48,7 @@ bool task::suspend_from_isr(void) {
 }
 
 bool task::is_running(void) {
-    return this->is_valid() && eTaskGetState(this->handle) == eRunning;
+    return this->is_valid() && eTaskGetState(this->handle) != eSuspended;
 }
 
 bool task::join(uint32_t observer_delay_ms, uint32_t timeout_ms) {
