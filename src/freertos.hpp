@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FreeRTOS/FreeRTOS.h"
+#include "freertos/FreeRTOS.h"
 
 #include "constants.hpp"
 #include "typedefs.hpp"
