@@ -14,11 +14,11 @@ tick_type system::get_tick_count_from_isr(void){
 }
 
 uint64_t system::get_milliseconds(void){
-    return pdTICKS_TO_MS(xTaskGetTickCount());
+    return ((TickType_t) (uint64_t) xTaskGetTickCount() * 1000 / configTICK_RATE_HZ);
 }
 
 uint64_t system::get_milliseconds_from_isr(void){
-    return pdTICKS_TO_MS(xTaskGetTickCountFromISR());
+    return ((TickType_t) (uint64_t) xTaskGetTickCountFromISR() * 1000 / configTICK_RATE_HZ);
 }
 
 u_base_type system::get_amount_of_tasks(void){

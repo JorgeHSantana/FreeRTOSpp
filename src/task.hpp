@@ -10,43 +10,38 @@ namespace freertos {
 
     namespace abstract {
         class task {
-            public:               
-                class info {
-                    public:
-                        enum class state {
-                            ready = eReady,
-                            running = eRunning,
-                            blocked = eBlocked,
-                            suspended = eSuspended,
-                            deleted = eDeleted,
-                            invalid = eInvalid
-                        };
-                    private:
-                        task_handle handle {nullptr};
-                        TaskStatus_t status;
-                        
-                        friend class task;
-                        friend class self;
-                    public:
-                        info(task_handle handle);
-                        
-                        uint16_t get_priority(void) const;
-                        uint16_t get_base_priority(void) const;
-                        uint32_t get_free_stack_memory(void) const;
-                        state get_state(void) const;
-                        
-                        #if configTASKLIST_INCLUDE_COREID
-                            uint32_t get_core_id(void) const;
-                        #endif
+            public:
+                
+                    class info {
+                        public:
+                            enum class state {
+                                ready = eReady,
+                                running = eRunning,
+                                blocked = eBlocked,
+                                suspended = eSuspended,
+                                deleted = eDeleted,
 
-                        const char* get_name(void) const;
-                        bool is_ready(void) const;
-                        bool is_running(void) const;
-                        bool is_blocked(void) const;
-                        bool is_suspended(void) const;
-                        bool is_deleted(void) const;
-                        bool is_invalid(void) const;
-                };            
+                                #if (tskKERNEL_VERSION_MAJOR > 8)
+                                    invalid = eInvalid
+                                #else 
+                                    invalid = eDeleted
+                                #endif
+                            };
+                        private:
+                            task_handle handle {nullptr};
+                            
+                            friend class task;
+                            friend class self;
+
+                        public:
+                            info(task_handle handle);
+                            
+                            uint16_t get_priority(void) const;
+                            uint32_t get_free_stack_memory(void) const;
+                            state get_state(void) const;
+                            const char* get_name(void) const;
+                    };
+
                 class notifier {
                     
                     private:
@@ -132,6 +127,7 @@ namespace freertos {
                 bool is_valid(void);
                 notifier get_notifier(void);
                 info get_info(void);
+
                 task_handle& get_handle(void);
         };
     }
@@ -189,8 +185,8 @@ namespace freertos {
                 using abstract::task::join;
                 using abstract::task::is_valid;
                 using abstract::task::get_notifier;
-                using abstract::task::get_info;
                 using abstract::task::get_handle;
+                using abstract::task::get_info;
         };
 
         template <uint32_t STACK_SIZE>
@@ -240,8 +236,8 @@ namespace freertos {
                 using abstract::task::join;
                 using abstract::task::is_valid;
                 using abstract::task::get_notifier;
-                using abstract::task::get_info;
                 using abstract::task::get_handle;
+                using abstract::task::get_info;
         };
     }
 
@@ -296,8 +292,8 @@ namespace freertos {
                 using abstract::task::join;
                 using abstract::task::is_valid;
                 using abstract::task::get_notifier;
-                using abstract::task::get_info;
                 using abstract::task::get_handle;
+                using abstract::task::get_info;
         };
 
         template <>
@@ -344,8 +340,8 @@ namespace freertos {
                 using abstract::task::join;
                 using abstract::task::is_valid;
                 using abstract::task::get_notifier;
-                using abstract::task::get_info;
                 using abstract::task::get_handle;
+                using abstract::task::get_info;
         };
     }
     

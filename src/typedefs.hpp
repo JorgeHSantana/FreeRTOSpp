@@ -1,10 +1,10 @@
 #pragma once
 
-#include "FreeRTOS/FreeRTOS.h"
-#include "FreeRTOS/task.h"
-#include "FreeRTOS/queue.h"
-#include "FreeRTOS/semphr.h"
-#include "FreeRTOS/timers.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/queue.h"
+#include "freertos/semphr.h"
+#include "freertos/timers.h"
 
 namespace freertos {
     namespace typedefs {

@@ -23,13 +23,16 @@ namespace freertos {
                 bool reset_from_isr(void);
                 bool set_period(uint32_t period_ms);
                 bool set_period_from_isr(uint32_t period_ms);
-                bool get_auto_reload(void);
-                bool set_auto_reload(bool auto_reload);
                 uint32_t get_period_ms(void);
                 uint32_t get_expiration_time_ms(void);
                 bool is_running(void);
                 bool is_valid(void);
                 timer_handle& get_handle(void);
+
+                #if (tskKERNEL_VERSION_MAJOR > 8)
+                    bool get_auto_reload(void);
+                    bool set_auto_reload(bool auto_reload);
+                #endif
         };
     }
 
@@ -70,12 +73,15 @@ namespace freertos {
                 using abstract::timer::reset_from_isr;
                 using abstract::timer::set_period;
                 using abstract::timer::set_period_from_isr;
-                using abstract::timer::get_auto_reload;
-                using abstract::timer::set_auto_reload;
                 using abstract::timer::get_period_ms;
                 using abstract::timer::get_expiration_time_ms;
                 using abstract::timer::is_running;
                 using abstract::timer::is_valid;
+                
+                #if (tskKERNEL_VERSION_MAJOR > 8)
+                    using abstract::timer::get_auto_reload;
+                    using abstract::timer::set_auto_reload;
+                #endif
         };
 
         template <>
@@ -108,12 +114,15 @@ namespace freertos {
                 using abstract::timer::reset_from_isr;
                 using abstract::timer::set_period;
                 using abstract::timer::set_period_from_isr;
-                using abstract::timer::get_auto_reload;
-                using abstract::timer::set_auto_reload;
                 using abstract::timer::get_period_ms;
                 using abstract::timer::get_expiration_time_ms;
                 using abstract::timer::is_running;
                 using abstract::timer::is_valid;
+
+                #if (tskKERNEL_VERSION_MAJOR > 8)
+                    using abstract::timer::get_auto_reload;
+                    using abstract::timer::set_auto_reload;
+                #endif
         };
     }
 
@@ -155,12 +164,15 @@ namespace freertos {
                 using abstract::timer::reset_from_isr;
                 using abstract::timer::set_period;
                 using abstract::timer::set_period_from_isr;
-                using abstract::timer::get_auto_reload;
-                using abstract::timer::set_auto_reload;
                 using abstract::timer::get_period_ms;
                 using abstract::timer::get_expiration_time_ms;
                 using abstract::timer::is_running;
                 using abstract::timer::is_valid;
+
+                #if (tskKERNEL_VERSION_MAJOR > 8)
+                    using abstract::timer::get_auto_reload;
+                    using abstract::timer::set_auto_reload;
+                #endif
         };
 
         template <>
@@ -195,12 +207,14 @@ namespace freertos {
                 using abstract::timer::reset_from_isr;
                 using abstract::timer::set_period;
                 using abstract::timer::set_period_from_isr;
-                using abstract::timer::get_auto_reload;
-                using abstract::timer::set_auto_reload;
                 using abstract::timer::get_period_ms;
                 using abstract::timer::get_expiration_time_ms;
                 using abstract::timer::is_running;
                 using abstract::timer::is_valid;
+                #if (tskKERNEL_VERSION_MAJOR > 8)
+                    using abstract::timer::get_auto_reload;
+                    using abstract::timer::set_auto_reload;
+                #endif
         };
     }
 }

@@ -102,24 +102,7 @@ uint32_t timer::get_period_ms(void){
         return 0;
     }
 
-    return pdTICKS_TO_MS(xTimerGetPeriod(this->handle));
-}
-
-bool timer::get_auto_reload(void){
-    if (this->handle == nullptr) {
-        return false;
-    }
-
-    return xTimerIsTimerActive(this->handle) == pdTRUE;
-}
-
-bool timer::set_auto_reload(bool auto_reload){
-    if (this->handle == nullptr) {
-        return false;
-    }
-
-    vTimerSetReloadMode(this->handle, static_cast<UBaseType_t>(auto_reload));
-    return true;
+    return ((TickType_t) (uint64_t) xTimerGetPeriod(this->handle) * 1000 / configTICK_RATE_HZ);
 }
 
 uint32_t timer::get_expiration_time_ms(void){
@@ -127,9 +110,28 @@ uint32_t timer::get_expiration_time_ms(void){
         return 0;
     }
 
-    return pdTICKS_TO_MS(xTimerGetExpiryTime(this->handle));
+    return ((TickType_t) (uint64_t) xTimerGetExpiryTime(this->handle) * 1000 / configTICK_RATE_HZ);
 }
 
 timer_handle& timer::get_handle(void){
     return this->handle;
 }
+
+#if (tskKERNEL_VERSION_MAJOR > 8)
+    bool timer::get_auto_reload(void){
+        if (this->handle == nullptr) {
+            return false;
+        }
+
+        return xTimerIsTimerActive(this->handle) == pdTRUE;
+    }
+
+    bool timer::set_auto_reload(bool auto_reload){
+        if (this->handle == nullptr) {
+            return false;
+        }
+
+        vTimerSetReloadMode(this->handle, static_cast<UBaseType_t>(auto_reload));
+        return true;
+    }
+#endif
